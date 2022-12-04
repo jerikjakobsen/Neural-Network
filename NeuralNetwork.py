@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.random import rand
 
 class NeuralNetwork:
 
@@ -8,9 +9,9 @@ class NeuralNetwork:
     def __init__(self, inputSize, hiddenLayersSize, outputSize, activation) -> None:
         hiddenNodeCount = hiddenLayersSize[0]
         self.weights = []
-        self.weights.append(np.full((hiddenNodeCount, inputSize), 0.5)) # Set up weight Matrix for input layer to first hidden layer
-        self.weights.extend([np.full((hiddenNodeCount, hiddenNodeCount), 0.1) for i in range(hiddenNodeCount-2)]) # Set up weight matrices for hidden layers
-        self.weights.append(np.full((outputSize, hiddenNodeCount), 0.2)) # Set up Weight Matrix for output layer
+        self.weights.append(rand(hiddenNodeCount, inputSize)) # Set up weight Matrix for input layer to first hidden layer
+        self.weights.extend([rand(hiddenNodeCount, hiddenNodeCount) for i in range(hiddenNodeCount-2)]) # Set up weight matrices for hidden layers
+        self.weights.append(rand(outputSize, hiddenNodeCount)) # Set up Weight Matrix for output layer
         self.inputSize = inputSize
         self.hiddenLayersSize = hiddenLayersSize
         self.outputSize = outputSize
