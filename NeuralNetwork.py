@@ -39,12 +39,19 @@ class NeuralNetwork:
 
     def _trainFromOneSample(self, sampleX, sampleY, trainSize):
         self.predict(sampleX)
+        hiddenNodeCount = self.hiddenLayersSize[0]
+        inputSize = self.inputSize
+        outputSize = self.outputSize
+        self.weightGradient = []
+        self.weightGradient.append(np.zeros((hiddenNodeCount, inputSize))) # Set up weight Matrix for input layer to first hidden layer
+        self.weightGradient.extend([np.zeros((hiddenNodeCount, hiddenNodeCount)) for i in range(hiddenNodeCount-2)]) # Set up weight matrices for hidden layers
+        self.weightGradient.append(np.zeros((outputSize, hiddenNodeCount))) # Set up Weight Matrix for output layer
         AOEInitial = []
-        for i in range(self.outputs[-1]):
+        for i in range(len(self.outputs[self.hiddenLayersSize[1]+1])):
             nodeOutput = self.outputs[-1][i]
             err = - (sampleY[i] - nodeOutput)
-            AOEInitial.append[err]
-        self._BackProp(AOEInitial, self.hiddenLayersSize + 1, trainSize)
+            AOEInitial.append(err)
+        self._BackProp(AOEInitial, self.hiddenLayersSize[1] + 1, trainSize)
 
     def _BackProp(self, AOE, layer, trainSize):
         if layer == 0:
@@ -52,23 +59,23 @@ class NeuralNetwork:
         Deltas = []
         for j in range(len(AOE)):
             affectInErr = AOE[j]
-            outForNodeJ = self.outputs[layer, j]
+            outForNodeJ = self.outputs[layer][j]
             delta = affectInErr * outForNodeJ * (1-outForNodeJ)
             Deltas.append(delta)
         
-        AOENext = []
+        AOENext = np.zeros(self.layerSize(layer-1))
         for j in range(self.layerSize(layer-1)):
             for i in range(self.layerSize(layer)):
-                weightAdjustment = self.outputs[layer-1, j] * Deltas[j]
-                self.weightGradient[layer, i, j] += weightAdjustment / trainSize
-                AOENext[j] += Deltas[j] * self.weights[layer, i, j]
+                weightAdjustment = self.outputs[layer-1][j] * Deltas[j]
+                self.weightGradient[layer-1][i, j] += weightAdjustment / trainSize
+                AOENext[j] += Deltas[j] * self.weights[layer-1][ i, j]
         self._BackProp(AOENext, layer-1, trainSize)
 
 
     def layerSize(self, layer):
         if layer == 0:
             return self.inputSize
-        elif layer == self.hiddenLayersSize + 1:
+        elif layer == self.hiddenLayersSize[1] + 1:
             return self.outputSize
         else:
-            return self.hiddenLayersSize
+            return self.hiddenLayersSize[0]
